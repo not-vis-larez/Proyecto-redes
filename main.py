@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import shutil
-import math
 import calculo_de_impedancias
 import ybus
 
@@ -22,12 +21,13 @@ Valores_V_fuente = Dframe_V_fuente.astype(float, errors="ignore")
 Dframe_V_fuente.fillna(0, inplace=True)    # Rellenar vacíos con 0.
 DfWarnings_V = pd.DataFrame(Valores_V_fuente)
 
-Desfase_V_fuente = np.array(Dframe_V_fuente.iloc[:, 3], dtype="float_")         # Angulo de desfase fuente voltaje.
+Corrimiento_de_onda_V_fuente = np.array(Dframe_V_fuente.iloc[:, 3], dtype="float_")         # Angulo de desfase fuente voltaje.
 V_pico_V_fuente = np.array(Dframe_V_fuente.iloc[:, 2] / np.sqrt(2))             # Voltaje pico de la fuente voltaje.
 Resistencia_V_fuente = np.array(Dframe_V_fuente.iloc[:, 4])                     # Resistencia de fuente voltaje.
 Inductancia_V_fuente = np.array(Dframe_V_fuente.iloc[:, 5]) * (10 ** -3)        # Inductancia de fuente voltaje.
 Capacitancia_V_fuente = np.array(Dframe_V_fuente.iloc[:, 6]) * (10 ** -6)        # Capacitancia de fuente voltaje.
 
+Desface_V_fuente = Corrimiento_de_onda_V_fuente*Velocidad_Angular
 
 Nodo_V_fuente_i = np.array(Dframe_V_fuente.iloc[:, 0])                  # Nodo i fuente voltaje.
 Nodo_V_fuente_j = np.full((len(Dframe_V_fuente.iloc[:, 0])), 0)         # Nodo j fuente voltaje.
@@ -169,7 +169,7 @@ for i in range(len(Nodo_Z_i)):
                         # -Inicio de los cálculos para el análisis del Circuito en AC- #
 def Main_Analisis():
 
-                                        # -Cálculo de impedancias- #
+                                        # Cálculo de impedancias
 
     # Fuentes de voltaje.
 
@@ -197,33 +197,24 @@ def Main_Analisis():
     Dato_Ramas = np.transpose(Dato_Ramas)
 
 
-                                            # -Cálculo del Ybus, Zth y Vth- #
+                                            # Cálculo Ybus, Zth y Vth 
 
-    # Corrientes inyectadas.
-    #print(V_pico_V_fuente)
-    Vector_Corrientes_I = calculo_de_impedancias.Matriz_Corrientes(V_pico_V_fuente, I_pico_I_fuente,  Desfase_V_fuente, Desfase_I_fuente, Imp_V_fuente, Nro_Nodos, Nodo_V_fuente_i, Nodo_I_fuente_i)
+#Corrientes inyectadas
+    Vector_Corrientes_I = calculo_de_impedancias.Matriz_Corrientes(V_pico_V_fuente, I_pico_I_fuente,  Desface_V_fuente, Desfase_I_fuente, Imp_V_fuente, Nro_Nodos, Nodo_V_fuente_i, Nodo_I_fuente_i)
     
 
     # Ybus.
-
     y_bus = ybus.Matriz_Y_Bus(V_fuente, I_fuente, Zs, Nro_Nodos, Nro_Nodos_i, Nro_Nodos_j) 
-    #y_bus = np.round(y_bus,4)
-    
-
     # Zth.
-
     Zth, zbus = ybus.Zth(y_bus)
-
-
     # Vth.
-
     V_thevenin, V_thevenin_rect = ybus.Vth(zbus, Vector_Corrientes_I, Nro_Nodos)
 
-                                                # -Guardado de datos- #
+#Guardado de datos
 
     Escritor_Guardado = pd.ExcelWriter("data_io.xlsx", mode="a", if_sheet_exists="overlay")
     
-    # -Vth y Zth
+#Vth y Zth
     Modulo_Vth = np.sqrt((V_thevenin_rect.real ** 2) + (V_thevenin_rect.imag ** 2))
     Angulo_Vth = np.arctan(V_thevenin_rect.imag / V_thevenin_rect.real) * 180 / np.pi
 
@@ -239,17 +230,15 @@ def Main_Analisis():
 
     Escritor_Guardado.close()
 
-    
-
-                                                # -Copiado del archivo- #
+#Copiado del archivo
 
     FileName = Dframe_f_output.iloc[1, 1]
 
     shutil.copy2("data_io.xlsx", FileName)
 
-    print(f"\n\tCálculo terminado para el archivo de salida: {FileName}.\n")
+    print("\n\tCálculo terminado para el archivo de salida: {FileName}.\n")
 
 if __name__ == "__main__":
 
-    print(f"\n\tIniciando proceso de cálculos para el circuito en AC\n")
+    print("\n\tIniciando proceso de cálculos para el circuito en AC\n")
     Main_Analisis()
