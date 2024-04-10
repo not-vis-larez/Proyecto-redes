@@ -95,15 +95,15 @@ def Matriz_Corrientes(Voltaje, Corriente, Desface_v, Desface_I, Impedancia_v, Nr
 
     for i in range(len(Nodo_v_i)):
 
-        indice = Nodo_v_i[i]-1
+        indicefuentevoltaje = Nodo_v_i[i]-1
         Desface_v[i]= (Desface_v[i] * math.pi) / 180
-        Vec_Corrientes[indice] = (Voltaje[i] * (math.cos(Desface_v[i]) + 1j*math.sin(Desface_v[i])) / Impedancia_v[i]) 
+        Vec_Corrientes[indicefuentevoltaje] = (Voltaje[i] * (math.cos(Desface_v[i]) + 1j*math.sin(Desface_v[i])) / Impedancia_v[i]) 
 
     for i in range(len(Nodo_I_i)):
 
-        indice2 = Nodo_I_i[i]-1
+        indicefuentecorriente = Nodo_I_i[i]-1
         Desface_I[i]= (Desface_I[i] * math.pi) / 180
-        Vec_Corrientes[indice2] += Corriente[i] * (math.cos(Desface_I[i]) + 1j*math.sin(Desface_I[i]))
+        Vec_Corrientes[indicefuentecorriente] += Corriente[i] * (math.cos(Desface_I[i]) + 1j*math.sin(Desface_I[i]))
         
     #print(Vec_Corrientes)       
     return Vec_Corrientes

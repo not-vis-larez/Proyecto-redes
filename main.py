@@ -5,7 +5,7 @@ import math
 import calculo_de_impedancias
 import ybus
 
-#Para calcular velocidad angular
+#Para calcular velocidad angular :p
 
 Dframe_f_output=pd.read_excel("data_io.xlsx","f_and_ouput", header=None)
 
@@ -60,9 +60,9 @@ Dframe_Z.fillna(0, inplace=True)    # Rellenar vacíos con 0.
 DfWarnings_Z = pd.DataFrame(Valores_Z)
 
 
-Res_Z = np.array(Dframe_Z.iloc[:, 3])                                   # Resistores.
-Ind_Z = np.array(Dframe_Z.iloc[:, 4]) * (10 ** -6)                      # Inductores.
-Cap_Z = np.array(Dframe_Z.iloc[:, 5]) * (10 ** -6)                      # Capacitores.
+Resistencia_Z = np.array(Dframe_Z.iloc[:, 3])                                   # Resistores.
+Inductancia_Z = np.array(Dframe_Z.iloc[:, 4]) * (10 ** -6)                      # Inductores.
+Capacitancia_Z = np.array(Dframe_Z.iloc[:, 5]) * (10 ** -6)                      # Capacitores.
 
 Nodo_Z_i = np.array(Dframe_Z.iloc[:, 0])                                # Bus i.
 Nodo_Z_j = np.array(Dframe_Z.iloc[:, 1])                                # Bus j.
@@ -90,12 +90,6 @@ Nro_Nodos = int(max(Nro_Nodos_i,Nro_Nodos_j))
 
 #Warnings !!!
 Escritor_Warnings = pd.ExcelWriter("data_io.xlsx", mode="a", if_sheet_exists="overlay")
-
-#_________________________________________________________________________________________________________________________
-
-#_________________________________________________________________________________________________________________
-
-
 
 # -V fuente
 for i in range(len(Nodo_V_fuente_i)):
@@ -155,15 +149,15 @@ for i in range(len(Nodo_I_fuente_i)):
 # -Z
 for i in range(len(Nodo_Z_i)):
 
-    if (Res_Z[i] < 0) or (Ind_Z[i] < 0) or (Cap_Z[i] < 0):
+    if (Resistencia_Z[i] < 0) or (Inductancia_Z[i] < 0) or (Capacitancia_Z[i] < 0):
        
-       IndiceVPNeg = [valor for valor, dato in enumerate(Res_Z) if dato < 0]
+       IndiceVPNeg = [valor for valor, dato in enumerate(Resistencia_Z) if dato < 0]
        DfWarnings_Z.loc[IndiceVPNeg, "Warning"] = "Res/Ind/Cap no puede ser negativo."
         
-       IndiceVPNeg = [valor for valor, dato in enumerate(Ind_Z) if dato < 0]
+       IndiceVPNeg = [valor for valor, dato in enumerate(Inductancia_Z) if dato < 0]
        DfWarnings_Z.loc[IndiceVPNeg, "Warning"] = "Res/Ind/Cap no puede ser negativo." 
 
-       IndiceVPNeg = [valor for valor, dato in enumerate(Cap_Z) if dato < 0]
+       IndiceVPNeg = [valor for valor, dato in enumerate(Capacitancia_Z) if dato < 0]
        DfWarnings_Z.loc[IndiceVPNeg, "Warning"] = "Res/Ind/Cap no puede ser negativo." 
 
        DfWarnings_Z.to_excel(Escritor_Warnings, "Z", index=False)
@@ -195,11 +189,11 @@ def Main_Analisis():
 
     # Ramas.
 
-    Imp_Z, Impres_Z, Impind_Z, Impcap_Z = calculo_de_impedancias.Z(Res_Z, Ind_Z, Cap_Z, Velocidad_Angular, Nodo_Z_i)
+    Imp_Z, Impres_Z, Impind_Z, Impcap_Z = calculo_de_impedancias.Z(Resistencia_Z, Inductancia_Z, Capacitancia_Z, Velocidad_Angular, Nodo_Z_i)
     Zs = np.concatenate(([Nodo_Z_i], [Nodo_Z_j], [Imp_Z]), axis=0)      
     Zs = np.transpose(Zs)
     
-    Dato_Ramas = np.concatenate(([Res_Z], [Ind_Z], [Cap_Z]), axis=0)
+    Dato_Ramas = np.concatenate(([Resistencia_Z], [Inductancia_Z], [Capacitancia_Z]), axis=0)
     Dato_Ramas = np.transpose(Dato_Ramas)
 
 
@@ -243,47 +237,6 @@ def Main_Analisis():
 
     Dframe_VZth.to_excel(Escritor_Guardado, "VTH_AND_ZTH", index=False)
 
-    # -Sfuente
-    #for i in range(len(Nodo_V_fuente_i)):
-        
-     #   Dframe_Sfuente.loc[i, "Bus i"] = Nodo_V_fuente_i[i]
-      #  Dframe_Sfuente.loc[i, "Bus j"] = Nodo_V_fuente_j[i]
-       # Dframe_Sfuente.loc[i, "P [W]"] = P_V_fuente[i]
-        #Dframe_Sfuente.loc[i, "Q [VAr]"] = Q_V_fuente[i]
-#
- #   FilaIV = len(Nodo_V_fuente_i) 
-    
-  #  for k in range(len(Nodo_I_fuente_i)):
-        
-   #     Dframe_Sfuente.loc[FilaIV + k + 1, "Bus i"] = Nodo_I_fuente_i[k]
-    #    Dframe_Sfuente.loc[FilaIV + k + 1, "Bus j"] = Nodo_I_fuente_j[k]
-     #   Dframe_Sfuente.loc[FilaIV + k + 1, "P [W]"] = round(P_I_fuente[k], 4)
-      #  Dframe_Sfuente.loc[FilaIV + k + 1, "Q [VAr]"] = round(Q_I_fuente[k], 4)
-      
-   # Dframe_Sfuente.to_excel(Escritor_Guardado, "Sfuente", index=False)
-
-    # -S_Z
-    #for i in range(len(P_Z)):
-
-     #   Dframe_SZ.loc[i, "Bus i"] = Nodo_Z_i[i]
-    #    Dframe_SZ.loc[i, "Bus j"] = Nodo_Z_j[i]
-     #   Dframe_SZ.loc[i, "P [W]"] = P_Z[i]
-      #  Dframe_SZ.loc[i, "Q [Var]"] = Q_Z[i]
-
-
-   # Dframe_SZ.to_excel(Escritor_Guardado, "S_Z", index=False)
-
-    # -Balance S
-   # Dframe_BalanceS.loc[0, "Pf total(W)"] = round(np.sum(P_V_fuente) + np.sum(P_I_fuente), 4)
-    #Dframe_BalanceS.loc[0, "Qf total(VAr)"] = round(np.sum(Q_V_fuente) + np.sum(Q_I_fuente), 4)
-    #Dframe_BalanceS.loc[0, "Pz total(W)"] = round(np.sum(P_Z) + np.sum(Pzvf) + np.sum(Pzif), 4)
-    #Dframe_BalanceS.loc[0, "Qz total(VAr)"] = round(np.sum(Q_Z) + np.sum(Qzvf) + np.sum(Qzif), 4)
-    #Dframe_BalanceS.loc[0, "Delta P(W)"] = D_P
-    #Dframe_BalanceS.loc[0, "Delta Q total(VAr)"] = D_Q
-
-    #Dframe_BalanceS.to_excel(Escritor_Guardado, "Balance_S", index=False)
-    
-
     Escritor_Guardado.close()
 
     
@@ -294,9 +247,9 @@ def Main_Analisis():
 
     shutil.copy2("data_io.xlsx", FileName)
 
-    print(f"\n\tFinalizado para: {FileName}.\n")
+    print(f"\n\tCálculo terminado para el archivo de salida: {FileName}.\n")
 
 if __name__ == "__main__":
 
-    print(f"\n\tIniciando cálculos para el circuito en AC\n")
+    print(f"\n\tIniciando proceso de cálculos para el circuito en AC\n")
     Main_Analisis()
