@@ -236,9 +236,9 @@ def Main_Analisis():
 
     shutil.copy2("data_io.xlsx", FileName)
 
-    print("\n\tCálculo terminado para el archivo de salida: {FileName}.\n")
+    print(f"\n\tCálculo terminado para el archivo de salida: {FileName}.\n")
 
 if __name__ == "__main__":
 
-    print("\n\tIniciando proceso de cálculos para el circuito en AC\n")
+    print("\n\tIniciando proceso de cálculos para el circuito en AC...\n\tPor favor, espere...\n")
     Main_Analisis()
